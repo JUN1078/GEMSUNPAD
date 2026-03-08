@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, ArrowRight, X, CheckCircle, Star, RotateCcw } from 'lucide-react';
+import { ArrowLeft, ArrowRight, X, CheckCircle, Star } from 'lucide-react';
 import { GEO_TOPICS, STORAGE_KEY } from './GeonovaLearningPage';
 
 // ── Slide Types ───────────────────────────────────────────────────────────────
