@@ -1,5 +1,6 @@
 import Database from 'better-sqlite3';
 import path from 'path';
+import fs from 'fs';
 import dotenv from 'dotenv';
 import bcrypt from 'bcryptjs';
 
@@ -11,7 +12,9 @@ let db: Database.Database;
 
 export function getDb(): Database.Database {
   if (!db) {
-    db = new Database(path.resolve(DB_PATH));
+    const resolved = path.resolve(DB_PATH);
+    fs.mkdirSync(path.dirname(resolved), { recursive: true });
+    db = new Database(resolved);
     db.pragma('journal_mode = WAL');
     db.pragma('foreign_keys = ON');
     initSchema();
