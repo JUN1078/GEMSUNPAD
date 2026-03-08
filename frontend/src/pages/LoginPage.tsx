@@ -6,50 +6,28 @@ import api from '../lib/api';
 import { useStore } from '../store/useStore';
 import logo from '../assets/logo.png';
 
-const DEMO_ACCOUNTS = [
-  { label: 'Admin', email: 'admin@gems.unpad.ac.id', password: 'admin123', color: 'bg-red-50 border-red-200 text-red-700' },
-  { label: 'Anggota HSE', email: 'anggota@gems.unpad.ac.id', password: 'anggota123', color: 'bg-primary-50 border-primary-200 text-primary-700' },
-  { label: 'Calon', email: 'calon@gems.unpad.ac.id', password: 'calon123', color: 'bg-orange-50 border-orange-200 text-orange-700' },
-  { label: 'Umum', email: 'umum@gems.unpad.ac.id', password: 'umum1234', color: 'bg-blue-50 border-blue-200 text-blue-700' },
-];
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [show, setShow] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [demoLoading, setDemoLoading] = useState<string | null>(null);
   const { setAuth } = useStore();
   const navigate = useNavigate();
-
-  const doLogin = async (e: string, p: string) => {
-    const { data } = await api.post('/auth/login', { email: e, password: p });
-    setAuth(data.user, data.token);
-    toast.success(`Selamat datang, ${data.user.name}!`);
-    navigate('/app');
-  };
 
   const handleLogin = async (e: { preventDefault(): void }) => {
     e.preventDefault();
     if (!email || !password) return toast.error('Email dan password wajib diisi');
     setLoading(true);
     try {
-      await doLogin(email, password);
+      const { data } = await api.post('/auth/login', { email, password });
+      setAuth(data.user, data.token);
+      toast.success(`Selamat datang, ${data.user.name}!`);
+      navigate('/app');
     } catch (err: any) {
       toast.error(err.response?.data?.error || 'Login gagal');
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleDemo = async (acc: typeof DEMO_ACCOUNTS[0]) => {
-    setDemoLoading(acc.label);
-    try {
-      await doLogin(acc.email, acc.password);
-    } catch (err: any) {
-      toast.error(err.response?.data?.error || 'Login demo gagal');
-    } finally {
-      setDemoLoading(null);
     }
   };
 
@@ -106,22 +84,10 @@ export default function LoginPage() {
           <Link to="/register" className="text-primary-600 font-bold hover:underline">Daftar sekarang</Link>
         </p>
 
-        {/* Demo Accounts */}
-        <div className="mt-5 p-4 bg-gray-50 rounded-2xl border border-gray-100">
-          <p className="text-xs font-black text-gray-400 uppercase tracking-widest mb-3 text-center">Akun Demo</p>
-          <div className="grid grid-cols-2 gap-2">
-            {DEMO_ACCOUNTS.map(acc => (
-              <button
-                key={acc.label}
-                onClick={() => handleDemo(acc)}
-                disabled={!!demoLoading}
-                className={`${acc.color} border rounded-xl px-3 py-2.5 text-left active:scale-95 transition-transform disabled:opacity-60`}
-              >
-                <p className="text-xs font-black">{demoLoading === acc.label ? 'Loading...' : acc.label}</p>
-                <p className="text-[10px] opacity-70 mt-0.5">{acc.email.split('@')[0]}</p>
-              </button>
-            ))}
-          </div>
+        <div className="mt-5 p-3 bg-green-50 rounded-xl border border-green-100">
+          <p className="text-xs text-primary-700 font-medium text-center">
+            🎓 GEMS Unpad · Geology HSE Management System – Universitas Padjadjaran
+          </p>
         </div>
       </div>
     </div>
