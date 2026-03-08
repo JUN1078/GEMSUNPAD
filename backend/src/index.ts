@@ -34,24 +34,7 @@ getDb();
 app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
 
 // ── CORS ──────────────────────────────────────────────────────────────────────
-const ALLOWED_ORIGINS = [
-  'http://localhost:5173',
-  'http://localhost:3000',
-  process.env.FRONTEND_URL,
-].filter(Boolean) as string[];
-
-app.use(cors({
-  origin: (origin, callback) => {
-    if (!origin) return callback(null, true); // mobile / curl
-    if (origin.match(/^http:\/\/localhost:\d+$/)) return callback(null, true);
-    if (ALLOWED_ORIGINS.includes(origin)) return callback(null, true);
-    // Allow any Vercel preview URLs for the project
-    if (origin.match(/^https:\/\/[\w-]+-jun1078s-projects\.vercel\.app$/)) return callback(null, true);
-    if (origin.match(/^https:\/\/gemsunpad.*\.vercel\.app$/)) return callback(null, true);
-    callback(new Error('Not allowed by CORS'));
-  },
-  credentials: true,
-}));
+app.use(cors({ origin: true, credentials: true }));
 
 // ── Compression ───────────────────────────────────────────────────────────────
 app.use(compression());
