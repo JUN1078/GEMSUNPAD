@@ -180,29 +180,8 @@ export default function AppLayout() {
         </div>
       )}
 
-      {/* ── Sticky Top Bar ── */}
-      <header className="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] z-40 bg-white border-b border-gray-100 shadow-sm"
-        style={{ paddingTop: 'env(safe-area-inset-top)' }}>
-        <div className="flex items-center justify-between px-4 h-12">
-          <button onClick={() => setDrawerOpen(true)} className="flex items-center gap-2.5">
-            <div className="w-7 h-7 rounded-lg bg-primary-600 overflow-hidden flex-shrink-0">
-              <img src={logo} alt="Logo" className="w-full h-full object-cover" />
-            </div>
-            <span className="font-black text-sm text-gray-800">GEMS Unpad</span>
-          </button>
-          <div className="flex items-center gap-1">
-            <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${roleInfo.color}`}>{roleInfo.label}</span>
-            <button onClick={() => setDrawerOpen(true)} className="p-2 text-gray-500">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-                <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
-              </svg>
-            </button>
-          </div>
-        </div>
-      </header>
-
       {/* ── Page content ── */}
-      <main className="flex-1 w-full overflow-x-hidden pb-20 pt-12">
+      <main className="flex-1 w-full overflow-x-hidden pb-20">
         <Outlet />
       </main>
 
