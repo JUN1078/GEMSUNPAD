@@ -1,0 +1,36 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Environment variables
+.env
+**/.env
+
+# Build outputs
+dist/
+**/dist/
+
+# SQLite database
+backend/data/*.db
+backend/data/*.db-journal
+
+# Uploaded files
+backend/uploads/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Large unrelated folders
+tailwindcss-main/
+rock-classification-main/
+claude-scientific-skills-main/
+backend/nul
