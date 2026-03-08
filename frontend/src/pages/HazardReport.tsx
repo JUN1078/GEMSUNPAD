@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Camera, MapPin, ArrowLeft, Sparkles, CheckCircle, AlertTriangle, Upload, PenLine, ChevronDown } from 'lucide-react';
+import { Camera, MapPin, ArrowLeft, Sparkles, CheckCircle, AlertTriangle, Upload, PenLine, Volume2, FlaskConical, Bug, Bone, Brain, Settings, Zap, ShieldAlert, Ban } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '../lib/api';
 
@@ -11,35 +11,17 @@ const RISK_BG: Record<string, string> = {
   Low: 'bg-green-50 border-green-300 text-green-700',
 };
 
-const HAZARD_CATEGORIES: Record<string, string[]> = {
-  'Bahaya Lingkungan': [
-    'Tanah Longsor', 'Pohon Tumbang', 'Genangan Air / Banjir',
-    'Jalan Licin', 'Retakan Tanah', 'Batu Jatuh', 'Cuaca Ekstrem', 'Debu / Kualitas Udara Buruk',
-  ],
-  'Bahaya Infrastruktur': [
-    'Jalan Rusak', 'Lubang di Jalan / Trotoar', 'Lampu Jalan Mati',
-    'Bangunan Retak', 'Tangga Rusak', 'Drainase Tersumbat', 'Pagar Rusak', 'Area Parkir Tidak Aman',
-  ],
-  'Bahaya Laboratorium': [
-    'Tumpahan Bahan Kimia', 'Gas Berbahaya', 'Alat Laboratorium Rusak',
-    'Api / Risiko Kebakaran', 'Penyimpanan Bahan Kimia Tidak Aman', 'Ventilasi Buruk',
-  ],
-  'Bahaya Kegiatan Lapangan': [
-    'Medan Terjal', 'Batu Longgar', 'Jalur Tidak Aman',
-    'Risiko Jatuh', 'Area Tebing', 'Sungai Berarus Deras', 'Hewan Liar',
-  ],
-  'Perilaku Tidak Aman': [
-    'Tidak Menggunakan APD', 'Merokok di Area Terlarang', 'Menggunakan Alat Tidak Sesuai',
-    'Melanggar Prosedur Keselamatan', 'Bekerja Sendirian di Area Berbahaya',
-  ],
-  'Bahaya Kebakaran & Darurat': [
-    'Potensi Kebakaran', 'Korsleting Listrik', 'APAR Tidak Tersedia',
-    'Jalur Evakuasi Terhalang', 'Alarm Kebakaran Tidak Berfungsi',
-  ],
-  'Bahaya Biologi': [
-    'Sarang Tawon', 'Ular', 'Anjing Liar', 'Serangga Berbahaya', 'Tanaman Beracun',
-  ],
-};
+const HAZARD_CATEGORIES = [
+  { label: 'Bahaya Fisik',       icon: Volume2,    color: 'bg-blue-50 border-blue-200 text-blue-700',      iconColor: 'text-blue-500' },
+  { label: 'Bahaya Kimia',       icon: FlaskConical, color: 'bg-purple-50 border-purple-200 text-purple-700', iconColor: 'text-purple-500' },
+  { label: 'Bahaya Biologi',     icon: Bug,        color: 'bg-green-50 border-green-200 text-green-700',    iconColor: 'text-green-500' },
+  { label: 'Bahaya Ergonomi',    icon: Bone,       color: 'bg-amber-50 border-amber-200 text-amber-700',    iconColor: 'text-amber-500' },
+  { label: 'Bahaya Psikososial', icon: Brain,      color: 'bg-pink-50 border-pink-200 text-pink-700',      iconColor: 'text-pink-500' },
+  { label: 'Bahaya Mekanik',     icon: Settings,   color: 'bg-gray-50 border-gray-300 text-gray-700',      iconColor: 'text-gray-500' },
+  { label: 'Bahaya Elektrik',    icon: Zap,        color: 'bg-yellow-50 border-yellow-200 text-yellow-700', iconColor: 'text-yellow-500' },
+  { label: 'Kondisi Tidak Aman', icon: ShieldAlert, color: 'bg-orange-50 border-orange-200 text-orange-700', iconColor: 'text-orange-500' },
+  { label: 'Tindakan Tidak Aman', icon: Ban,       color: 'bg-red-50 border-red-200 text-red-700',         iconColor: 'text-red-500' },
+];
 
 export default function HazardReport() {
   const navigate = useNavigate();
@@ -49,7 +31,6 @@ export default function HazardReport() {
   const [photo, setPhoto] = useState<File | null>(null);
   const [preview, setPreview] = useState('');
   const [mainCat, setMainCat] = useState('');
-  const [subCat, setSubCat] = useState('');
   const [form, setForm] = useState({ description: '', location_name: '' });
   const [manualForm, setManualForm] = useState({
     category: '', risk_level: 'Medium', hazard_description: '',
@@ -78,13 +59,12 @@ export default function HazardReport() {
   const handleSubmit = async () => {
     if (!photo) return toast.error('Foto wajib diambil');
     if (!form.description) return toast.error('Deskripsi wajib diisi');
-    if (!mainCat) return toast.error('Pilih kategori utama bahaya');
-    if (!subCat) return toast.error('Pilih jenis bahaya');
+    if (!mainCat) return toast.error('Pilih kategori bahaya');
 
     setLoading(true);
     if (mode === 'ai') setStep('ai');
 
-    const combinedCat = `${mainCat}: ${subCat}`;
+    const combinedCat = mainCat;
 
     try {
       const fd = new FormData();
@@ -260,26 +240,26 @@ export default function HazardReport() {
         </div>
 
         {/* Category */}
-        <div className="mb-4 space-y-2">
-          <p className="text-sm font-bold text-gray-700">Kategori Bahaya <span className="text-red-500">*</span></p>
-          <div className="relative">
-            <select value={mainCat} onChange={e => { setMainCat(e.target.value); setSubCat(''); }}
-              className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm bg-gray-50 outline-none appearance-none">
-              <option value="">Pilih kategori utama...</option>
-              {Object.keys(HAZARD_CATEGORIES).map(cat => <option key={cat} value={cat}>{cat}</option>)}
-            </select>
-            <ChevronDown size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+        <div className="mb-4">
+          <p className="text-sm font-bold text-gray-700 mb-2">Kategori Bahaya <span className="text-red-500">*</span></p>
+          <div className="grid grid-cols-1 gap-2">
+            {HAZARD_CATEGORIES.map(cat => {
+              const Icon = cat.icon;
+              const selected = mainCat === cat.label;
+              return (
+                <button
+                  key={cat.label}
+                  type="button"
+                  onClick={() => setMainCat(selected ? '' : cat.label)}
+                  className={`flex items-center gap-3 px-4 py-3 rounded-xl border text-left transition-all active:scale-[0.98] ${selected ? `${cat.color} border-2 font-bold` : 'bg-white border-gray-200 text-gray-700'}`}
+                >
+                  <Icon size={18} className={selected ? cat.iconColor : 'text-gray-400'} />
+                  <span className="text-sm">{cat.label}</span>
+                  {selected && <CheckCircle size={16} className={`ml-auto ${cat.iconColor}`} />}
+                </button>
+              );
+            })}
           </div>
-          {mainCat && (
-            <div className="relative">
-              <select value={subCat} onChange={e => setSubCat(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-xl border border-primary-200 text-sm bg-primary-50 outline-none appearance-none">
-                <option value="">Pilih jenis bahaya...</option>
-                {HAZARD_CATEGORIES[mainCat].map(sub => <option key={sub} value={sub}>{sub}</option>)}
-              </select>
-              <ChevronDown size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-primary-400 pointer-events-none" />
-            </div>
-          )}
         </div>
 
         {/* Description */}
@@ -298,10 +278,10 @@ export default function HazardReport() {
               <PenLine size={15} /> Detail Bahaya
             </p>
 
-            {subCat && (
+            {mainCat && (
               <div className="bg-white rounded-xl px-3 py-2 border border-orange-200">
                 <p className="text-[10px] text-orange-600 font-semibold uppercase tracking-wide">Kategori terpilih</p>
-                <p className="text-xs font-bold text-gray-700 mt-0.5">{mainCat}: {subCat}</p>
+                <p className="text-xs font-bold text-gray-700 mt-0.5">{mainCat}</p>
               </div>
             )}
 
@@ -363,7 +343,7 @@ export default function HazardReport() {
 
         {/* Submit */}
         <button onClick={handleSubmit}
-          disabled={loading || !photo || !form.description || !mainCat || !subCat}
+          disabled={loading || !photo || !form.description || !mainCat}
           className={`w-full py-4 text-white font-black rounded-2xl text-base active:scale-95 transition-all disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg
             ${mode === 'ai' ? 'bg-primary-600 shadow-green-200' : 'bg-orange-500 shadow-orange-200'}`}>
           {mode === 'ai' ? <Sparkles size={20} /> : <PenLine size={20} />}
